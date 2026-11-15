@@ -2,13 +2,14 @@
 
 This fork (`wkosh/horizon-legacy`) extends Horizon's native protocol adapter down to Minecraft 1.18.2
 (protocol 758) and 1.17.1 (protocol 756). Everything is translated in Rust inside the connection: no proxy,
-no ViaVersion, no Java. Like the rest of the adapter it is off by default:
+no ViaVersion, no Java. Upstream keeps the adapter off by default; in this fork it is on
+(`HORIZON_OLDER_SERVERS=0` turns it off):
 
 ```sh
-HORIZON_OLDER_SERVERS=1 horizon-client ...
+horizon-client --server play.example.org:25565
 ```
 
-With it on, the server list marks 1.18.2 and 1.17.1 servers as joinable and the connection picks the
+The server list marks 1.18.2 and 1.17.1 servers as joinable and the connection picks the
 translation from the server's status ping.
 
 ## How it works
