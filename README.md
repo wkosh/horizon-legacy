@@ -17,6 +17,11 @@
 
 # Horizon
 
+> **This fork (`wkosh/horizon-legacy`)** adds native Rust support for joining **Minecraft 1.18.2 and
+> 1.17.1** servers, translated inside Horizon's protocol adapter. Set `HORIZON_OLDER_SERVERS=1` to turn
+> it on. How it works and what is left: [docs/legacy-servers.md](docs/legacy-servers.md). Everything
+> else is upstream Horizon ([horizon-rust/horizon](https://github.com/horizon-rust/horizon), MIT).
+
 **Minecraft: Java Edition 26.3, rewritten in Rust.** Your worlds, the same rules and the same terrain as the Java game, checked against it by hundreds of differential tests, in one native program with no Java. Free, open source (MIT) and unofficial: you play it with your own copy of Java Edition.
 
 <p align="center">
