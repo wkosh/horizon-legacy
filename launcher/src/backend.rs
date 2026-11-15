@@ -10,8 +10,10 @@ use std::process::{Child, ChildStdin, Command, Stdio};
 use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 
-pub const REPO: &str = "horizon-rust/horizon";
-pub const README_URL: &str = "https://github.com/horizon-rust/horizon/blob/main/launcher/README.md";
+/// Horizon Legacy: releases, updates and the README come from the fork that joins 1.18.2 and 1.17.1
+/// servers, never from upstream (whose builds lack that).
+pub const REPO: &str = "wkosh/horizon-legacy";
+pub const README_URL: &str = "https://github.com/wkosh/horizon-legacy/blob/main/launcher/README.md";
 /// The players' page on connecting an AI agent (the website's docs/agents.md).
 pub const AGENT_DOCS_URL: &str = "https://playhorizon.dev/docs/agents";
 /// This launcher's version: the release workflow sets `HORIZON_LAUNCHER_VERSION` from the
@@ -545,6 +547,27 @@ pub fn is_game_tag(tag: &str) -> bool {
         .is_some_and(|rest| rest.starts_with(|c: char| c.is_ascii_digit()))
 }
 
+/// Horizon Legacy: the Minecraft release a game tag is made for, its line (`1.18.2` in
+/// `v2.0.0-1.18.2`, published as "Legacy v2 · 1.18.2"). Each update of a line is the next major
+/// (v1, v2, ...); an installed version updates only to a newer one of its own line. None for a tag
+/// without one.
+pub fn legacy_line(tag: &str) -> Option<&str> {
+    let (_, line) = tag.strip_prefix('v')?.split_once('-')?;
+    let numbers: Vec<&str> = line.split('.').collect();
+    (numbers.len() >= 2
+        && numbers
+            .iter()
+            .all(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit())))
+    .then_some(line)
+}
+
+/// A Horizon Legacy version as players read it: `Legacy v2 · 1.18.2` for `v2.0.0-1.18.2`.
+pub fn legacy_label(tag: &str) -> Option<String> {
+    let line = legacy_line(tag)?;
+    let major = tag.strip_prefix('v')?.split('.').next()?;
+    Some(format!("Legacy v{major} · {line}"))
+}
+
 /// The launcher version in a `launcher@X.Y.Z` (or `launcher-vX.Y.Z`) tag, or None for any other tag.
 pub fn launcher_version(tag: &str) -> Option<&str> {
     tag.strip_prefix(LAUNCHER_TAG_PREFIX)
@@ -929,7 +952,7 @@ pub fn data_dir() -> PathBuf {
     }
     dirs::data_dir()
         .unwrap_or_else(std::env::temp_dir)
-        .join("horizon-launcher")
+        .join("horizon-legacy-launcher")
 }
 
 /// A canonical path without Windows' verbatim prefix: `canonicalize` gives `\\?\C:\...` there,
@@ -2660,7 +2683,7 @@ pub fn game_home() -> PathBuf {
     }
     dirs::data_dir()
         .unwrap_or_else(std::env::temp_dir)
-        .join("horizon")
+        .join("horizon-legacy")
 }
 
 /// Whether No AI is on: every AI feature hidden and off (`horizon_platform::no_ai`, kept in the
@@ -2925,6 +2948,12 @@ pub fn client_command(tag: &str) -> Command {
         .env_remove("HORIZON_ACCOUNT_SESSIONS")
         .arg("--resources")
         .arg(resources(tag));
+    // Horizon Legacy: the release the version is made for, which the game joins a server as when the
+    // server's status ping doesn't answer.
+    match legacy_line(tag) {
+        Some(line) => cmd.env("HORIZON_LEGACY_TARGET", line),
+        None => cmd.env_remove("HORIZON_LEGACY_TARGET"),
+    };
     // How the game asks for a renewed session (`account session`) while it runs.
     if let Ok(exe) = std::env::current_exe() {
         cmd.env("HORIZON_LAUNCHER_EXE", exe);
@@ -3333,10 +3362,28 @@ pub struct Updates {
 /// no installed version is newer. Two Nightlies of one day compare equal: the one on GitHub is
 /// the update.
 pub fn horizon_update(releases: &[Release], installed: &[String]) -> Option<Release> {
-    let newest = latest(releases)?;
+    horizon_update_in_line(releases, installed, None)
+}
+
+/// [`horizon_update`] for Horizon Legacy's lines: only releases of the line of `selected` (or else of
+/// the newest installed version that has one) are an update, and only installed versions of that
+/// line are compared, so a 1.17.1 player never moves to 1.18.2 by itself.
+pub fn horizon_update_in_line(
+    releases: &[Release],
+    installed: &[String],
+    selected: Option<&str>,
+) -> Option<Release> {
+    let line = selected
+        .and_then(legacy_line)
+        .or_else(|| installed.iter().find_map(|t| legacy_line(t)));
+    let same = |tag: &str| line.is_none() || legacy_line(tag) == line;
+    let newest = releases
+        .iter()
+        .find(|r| r.asset.is_some() && same(&r.tag))?;
     let newer = !installed.contains(&newest.tag)
         && installed
             .iter()
+            .filter(|t| same(t))
             .all(|t| compare_versions(&newest.tag, t).is_ge());
     newer.then(|| newest.clone())
 }
@@ -3379,8 +3426,13 @@ fn releases_and_updates_with(
     };
     let releases = game_releases(&list);
     let installed_versions = installed();
-    let horizon = horizon_update(&installable_updates(&releases), &installed_versions)
-        .or_else(|| architecture_update(&releases, &installed_versions));
+    let selected = Settings::load().selected;
+    let horizon = horizon_update_in_line(
+        &installable_updates(&releases),
+        &installed_versions,
+        selected.as_deref(),
+    )
+    .or_else(|| architecture_update(&releases, &installed_versions));
     on_releases(Ok(releases));
     Ok(Updates {
         horizon,
@@ -3423,7 +3475,7 @@ pub fn select_after_update(selected: Option<&str>, installed_before: &[String]) 
         Some(s) if crate::build_import::is_imported(s) => false,
         Some(s) => installed_before
             .iter()
-            .find(|t| is_game_tag(t))
+            .find(|t| is_game_tag(t) && legacy_line(t) == legacy_line(s))
             .is_none_or(|newest| newest == s),
     }
 }
@@ -5703,6 +5755,49 @@ pub fn {f}("
             parse_version_output(&format!("horizon-launcher {VERSION}\n")),
             Some(VERSION)
         );
+    }
+
+    #[test]
+    fn a_legacy_version_updates_only_within_its_own_release() {
+        let release = |tag: &str| Release {
+            tag: tag.into(),
+            name: String::new(),
+            body: String::new(),
+            date: String::new(),
+            time: String::new(),
+            asset: Some(("u".into(), 1)),
+            prerelease: false,
+            nightly: None,
+        };
+        // Newest first, as the release list is sorted.
+        let mut releases: Vec<Release> = [
+            "v2.0.0-1.18.2",
+            "v2.0.0-1.17.1",
+            "v1.0.0-1.18.2",
+            "v1.0.0-1.17.1",
+        ]
+        .map(release)
+        .to_vec();
+        releases.sort_by(|a, b| compare_versions(&b.tag, &a.tag));
+        let update = |installed: &[&str], selected: Option<&str>| {
+            let installed: Vec<String> = installed.iter().map(|t| t.to_string()).collect();
+            horizon_update_in_line(&releases, &installed, selected).map(|r| r.tag)
+        };
+        assert_eq!(
+            update(&["v1.0.0-1.17.1"], Some("v1.0.0-1.17.1")).as_deref(),
+            Some("v2.0.0-1.17.1")
+        );
+        // A newer 1.18.2 installed beside it doesn't hold the 1.17.1 player back.
+        assert_eq!(
+            update(&["v2.0.0-1.18.2", "v1.0.0-1.17.1"], Some("v1.0.0-1.17.1")).as_deref(),
+            Some("v2.0.0-1.17.1")
+        );
+        assert_eq!(update(&["v2.0.0-1.18.2"], Some("v2.0.0-1.18.2")), None);
+        assert_eq!(
+            legacy_label("v2.0.0-1.18.2").as_deref(),
+            Some("Legacy v2 · 1.18.2")
+        );
+        assert_eq!(legacy_line("v0.2.1-alpha"), None);
     }
 
     #[test]

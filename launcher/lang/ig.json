@@ -1022,7 +1022,7 @@
   "Oct {day}": "Ọkt{day}",
   "Nov {day}": "Nov{day}",
   "Dec {day}": "Dec{day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizon's Nightly na-ewuli elu, nke kachasị ọhụrụ. Ụwa gị na-ebi na folda egwuregwu, yabụ iwepụ ụdị anaghị emetụ ha n'ahụ.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Na-ewepu…",
   "Use": "Jiri",
   "installed": "arụnyere",

@@ -11,7 +11,13 @@ fn scratch(name: &str) -> PathBuf {
 const T0: u64 = 1_800_000_000;
 const LATER: u64 = T0 + FRESH_SECS;
 
-const RELEASES: &str = "https://api.github.com/repos/horizon-rust/horizon/releases?per_page=100";
+const RELEASES: &str = "https://api.github.com/repos/wkosh/horizon-legacy/releases?per_page=100";
+
+/// Horizon Legacy ships with the mirror off ([`MIRROR`]); these tests turn one on, as
+/// `HORIZON_GITHUB_MIRROR` does. Every test sets the same value, so running them together is safe.
+fn mirror_on() {
+    std::env::set_var("HORIZON_GITHUB_MIRROR", "https://mcp.example/github/public");
+}
 
 fn list(tag: &str) -> serde_json::Value {
     serde_json::json!([{ "tag_name": tag }])
@@ -26,15 +32,23 @@ fn mirror_serves_only_horizons_repository() {
     let base = "https://mcp.example/github/public";
     assert_eq!(
         mirror_url_with(RELEASES, base).as_deref(),
-        Some("https://mcp.example/github/public/repos/horizon-rust/horizon/releases?per_page=100")
+        Some("https://mcp.example/github/public/repos/wkosh/horizon-legacy/releases?per_page=100")
     );
     assert_eq!(
         mirror_url_with(
-            "https://api.github.com/repos/horizon-rust/horizon/releases/tags/launcher@0.2.33",
+            "https://api.github.com/repos/wkosh/horizon-legacy/releases/tags/launcher@0.2.33",
             &format!("{base}/")
         )
         .as_deref(),
-        Some("https://mcp.example/github/public/repos/horizon-rust/horizon/releases/tags/launcher@0.2.33")
+        Some("https://mcp.example/github/public/repos/wkosh/horizon-legacy/releases/tags/launcher@0.2.33")
+    );
+    assert_eq!(
+        mirror_url_with(
+            "https://api.github.com/repos/horizon-rust/horizon/releases?per_page=100",
+            base
+        ),
+        None,
+        "upstream's repository isn't this launcher's"
     );
     assert_eq!(
         mirror_url_with("https://api.github.com/repos/someone/mod/commits/abc", base),
@@ -135,6 +149,7 @@ fn etag_is_kept_and_a_304_reads_the_saved_copy() {
 
 #[test]
 fn rate_limited_reads_go_through_the_mirror() {
+    mirror_on();
     let cache = scratch("mirror");
     let asked = RefCell::new(None);
     let got = json_with(
@@ -152,7 +167,7 @@ fn rate_limited_reads_go_through_the_mirror() {
         .borrow()
         .as_deref()
         .unwrap()
-        .ends_with("/github/public/repos/horizon-rust/horizon/releases?per_page=100"));
+        .ends_with("/github/public/repos/wkosh/horizon-legacy/releases?per_page=100"));
     // The mirror's answer is kept like GitHub's.
     let kept = json_with(RELEASES, &cache, T0 + 1, |_, _| panic!("fresh"), no_mirror);
     assert_eq!(kept.unwrap(), list("nightly"));
@@ -170,6 +185,7 @@ fn rate_limited_reads_go_through_the_mirror() {
 
 #[test]
 fn a_404_is_not_retried_on_the_mirror() {
+    mirror_on();
     let cache = scratch("404");
     let err = json_with(RELEASES, &cache, T0, |_, _| Answer::NotFound, no_mirror).unwrap_err();
     assert!(err.ends_with("answered 404"), "{err}");
@@ -187,6 +203,7 @@ fn a_404_is_not_retried_on_the_mirror() {
 
 #[test]
 fn both_failing_uses_the_saved_copy_else_says_so() {
+    mirror_on();
     let cache = scratch("both");
     let err = json_with(
         RELEASES,

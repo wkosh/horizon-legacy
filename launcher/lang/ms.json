@@ -1022,7 +1022,7 @@
   "Oct {day}": "Okt{day}",
   "Nov {day}": "Nov {day}",
   "Dec {day}": "Dis {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Binaan Horizon's Nightly, terbaharu dahulu. Dunia anda tinggal dalam folder permainan, jadi mengalih keluar versi tidak akan menyentuhnya.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Mengalih keluar…",
   "Use": "guna",
   "installed": "dipasang",

@@ -1024,7 +1024,7 @@
   "Oct {day}": "اکتبر {day}",
   "Nov {day}": "نوامبر {day}",
   "Dec {day}": "دسامبر {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "ساخت‌های Horizon's Nightly، ابتدا جدیدترین. دنیاهای شما در پوشه بازی زندگی می کنند، بنابراین حذف یک نسخه هرگز آنها را لمس نمی کند.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "در حال حذف…",
   "Use": "استفاده کنید",
   "installed": "نصب شده است",

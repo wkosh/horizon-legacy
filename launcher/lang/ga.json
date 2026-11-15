@@ -1022,7 +1022,7 @@
   "Oct {day}": "Deireadh Fómhair {day}",
   "Nov {day}": "Samhain {day}",
   "Dec {day}": "Nollaig {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Tógann Horizon Nightly, is nua ar dtús. Cónaíonn do shaol san fhillteán cluiche, mar sin ní bhainfidh baint a bheith acu le leagan riamh leo.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Ag baint…",
   "Use": "Úsáid",
   "installed": "suiteáilte",

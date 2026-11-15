@@ -1022,7 +1022,7 @@
   "Oct {day}": "oktyabr {day}",
   "Nov {day}": "noyabr {day}",
   "Dec {day}": "dekabr {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizon-in Gecəlik quruluşları, ən yenisi əvvəlcə. Dünyalarınız oyun qovluğunda yaşayır, ona görə də versiyanı silmək onlara heç vaxt toxunmur.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Silinir...",
   "Use": "istifadə edin",
   "installed": "quraşdırılıb",

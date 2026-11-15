@@ -1022,7 +1022,7 @@
   "Oct {day}": "Dàmhair {day}",
   "Nov {day}": "Samhain {day}",
   "Dec {day}": "Dùbhlachd {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Togail Nightly Horizon, as ùire an toiseach. Bidh an saoghal agad a’ fuireach ann am pasgan a’ gheama, agus mar sin cha bhith toirt air falbh dreach a’ beantainn riutha gu bràth.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "A’ toirt air falbh…",
   "Use": "Cleachd",
   "installed": "air a stàladh",

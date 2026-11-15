@@ -1022,7 +1022,7 @@
   "Oct {day}": "tetor {day}",
   "Nov {day}": "nëntor {day}",
   "Dec {day}": "dhjetor {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Ndërtimet e natës së Horizon, së pari më e reja. Botët tuaja jetojnë në dosjen e lojës, kështu që heqja e një versioni nuk i prek kurrë ato.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Po hiqet…",
   "Use": "Përdorni",
   "installed": "instaluar",

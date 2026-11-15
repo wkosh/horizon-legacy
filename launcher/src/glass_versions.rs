@@ -92,8 +92,9 @@ impl Launcher {
         let page_title = ui::page_head(
             tr("Versions"),
             tr(
-                "Horizon's Nightly builds, newest first. Your worlds live in the game \
-                folder, so removing a version never touches them.",
+                "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one \
+                updates only within its own release. Your worlds live in the game folder, so \
+                removing a version never touches them.",
             ),
         )
         .mb_0();
@@ -240,6 +241,9 @@ impl Launcher {
             |i| {
                 let release = releases[i].clone();
                 let (title, mut line) = nightly_card_text(&release).unwrap_or_else(|| {
+                    if let Some(title) = horizon_launcher::backend::legacy_label(&release.tag) {
+                        return (title, published(&release.date, &release.time));
+                    }
                     let title = release
                         .name
                         .split_once(": ")

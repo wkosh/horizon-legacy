@@ -1022,7 +1022,7 @@
   "Oct {day}": "Oktoobar {day}",
   "Nov {day}": "Nofeembar {day}",
   "Dec {day}": "Desembar {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizons Habeenkii wax dhisa, ugu cusub marka hore. Adduunyadaadu waxay ku nool yihiin galka ciyaarta, markaa ka saarista nooc waligeed ma taabanayso iyaga.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Ka saaraya…",
   "Use": "Isticmaal",
   "installed": "rakibay",

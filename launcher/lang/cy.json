@@ -1022,7 +1022,7 @@
   "Oct {day}": "Hyd {day}",
   "Nov {day}": "Tachwedd {day}",
   "Dec {day}": "Rhag {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Adeiladau Nos Horizon, mwyaf newydd yn gyntaf. Mae eich bydoedd yn byw yn y ffolder gêm, felly nid yw dileu fersiwn byth yn cyffwrdd â nhw.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Wrthi'n dileu…",
   "Use": "Defnydd",
   "installed": "gosod",

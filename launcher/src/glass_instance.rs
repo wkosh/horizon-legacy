@@ -565,9 +565,10 @@ pub(super) fn horizon_choices(releases: &[Release], installed: &[String]) -> Vec
     out
 }
 
-/// "Nightly · c9d474d", "Imported · 2026-10-30", or the tag.
+/// "Nightly · c9d474d", "Legacy v1 · 1.18.2", "Imported · 2026-10-30", or the tag.
 fn version_label(tag: &str) -> String {
     horizon_launcher::nightly::label(tag)
+        .or_else(|| horizon_launcher::backend::legacy_label(tag))
         .or_else(|| build_import::label(tag))
         .unwrap_or_else(|| tag.to_string())
 }

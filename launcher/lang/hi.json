@@ -1024,7 +1024,7 @@
   "Oct {day}": "{day} अक्तू॰",
   "Nov {day}": "{day} नव॰",
   "Dec {day}": "{day} दिस॰",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizon के Nightly बिल्ड, सबसे नए पहले। आपकी दुनियाएँ गेम फ़ोल्डर में रहती हैं, इसलिए कोई वर्ज़न हटाने से वे कभी नहीं छूतीं।",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "हटाया जा रहा है…",
   "Use": "इस्तेमाल करें",
   "installed": "इंस्टॉल है",
