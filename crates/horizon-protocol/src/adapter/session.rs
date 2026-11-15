@@ -42,7 +42,10 @@ fn from_u8(v: u8) -> State {
 
 /// Shared by a connection's reader and writer.
 pub struct Session {
+    /// The release whose layouts the steps read: the server's own, or 1.20.2 behind the legacy front.
     pub version: ServerVersion,
+    /// 1.18.2 and 1.17.1: the front that makes the server's wire 1.20.2's ([`super::front`]).
+    front: Option<super::front::Front>,
     /// Dimension of the last play login or respawn, for older packets with only a local block position.
     pub(super) dimension: Mutex<String>,
     /// Local entity id and last shift input, for pre-1.21.6 crouch commands.
@@ -69,12 +72,17 @@ pub struct Session {
     pub(super) incoming: Mutex<VecDeque<(i32, Vec<u8>)>>,
     /// Packet bodies to send right after the one being sent.
     pub(super) outgoing: Mutex<Vec<Vec<u8>>>,
+    /// Behind the front: the bodies it made of one packet, after the first.
+    fronted_after: Mutex<Vec<Vec<u8>>>,
 }
 
 impl Session {
     pub fn new(version: ServerVersion) -> Self {
+        let front = super::front::Front::new(version);
+        let version = version.chain();
         Self {
             version,
+            front,
             dimension: Mutex::new("minecraft:overworld".into()),
             local_player: Mutex::new(None),
             chat_index: std::sync::atomic::AtomicI32::new(0),
@@ -94,7 +102,12 @@ impl Session {
             kinds: Mutex::new(HashMap::new()),
             incoming: Mutex::new(VecDeque::new()),
             outgoing: Mutex::new(Vec::new()),
+            fronted_after: Mutex::new(Vec::new()),
         }
+    }
+    /// The release on the wire, which the handshake states.
+    pub fn wire_version(&self) -> ServerVersion {
+        self.front.as_ref().map_or(self.version, |f| f.version())
     }
     pub fn reading(&self) -> State {
         from_u8(self.reading.load(Ordering::Acquire))
@@ -128,6 +141,23 @@ impl Session {
     /// A packet the server sent, as the pinned version numbers and lays it out. `None` drops it: Horizon
     /// knows no such packet.
     pub fn clientbound(&self, id: i32, payload: Vec<u8>) -> Result<Option<(i32, Vec<u8>)>> {
+        let Some(front) = &self.front else {
+            return self.stepped(id, payload);
+        };
+        // The front makes any number of 1.20.2 packets of one; each goes up the steps in the state the
+        // ones before it left, and what the steps queue after a packet stays right behind it.
+        let mut ready = VecDeque::new();
+        for (id, payload) in front.clientbound(self.reading(), id, &payload)? {
+            ready.extend(self.stepped(id, payload)?);
+            ready.append(&mut self.incoming.lock().unwrap());
+        }
+        let first = ready.pop_front();
+        *self.incoming.lock().unwrap() = ready;
+        Ok(first)
+    }
+
+    /// A packet numbered and laid out as [`Self::version`] does, up the steps to the pinned version.
+    fn stepped(&self, id: i32, payload: Vec<u8>) -> Result<Option<(i32, Vec<u8>)>> {
         let state = self.reading();
         let _legacy = self
             .version
@@ -233,10 +263,31 @@ impl Session {
         let Some((mapped, payload)) = translate::serverbound(self, state, id, payload)? else {
             return Ok(None);
         };
+        if self.front.is_some() {
+            let mut bodies = self.fronted(state, mapped, &payload)?.into_iter();
+            let first = bodies.next();
+            self.fronted_after.lock().unwrap().extend(bodies);
+            return Ok(first);
+        }
         let mut w = Writer::new();
         w.varint(mapped);
         w.bytes(&payload);
         Ok(Some(w.data))
+    }
+
+    /// A packet numbered and laid out for [`Self::version`], through the front: the bodies the old
+    /// server reads. What the front answers in the server's place goes up the steps for Horizon to read.
+    fn fronted(&self, state: State, id: i32, payload: &[u8]) -> Result<Vec<Vec<u8>>> {
+        let Some(front) = &self.front else {
+            return Ok(Vec::new());
+        };
+        let sent = front.serverbound(state, id, payload)?;
+        for (id, payload) in sent.incoming {
+            if let Some(packet) = self.stepped(id, payload)? {
+                self.incoming.lock().unwrap().push_back(packet);
+            }
+        }
+        Ok(sent.wire)
     }
 
     /// A packet the translation made that Horizon reads next, already in the pinned version's numbering.
@@ -245,7 +296,25 @@ impl Session {
     }
     /// Bodies the translation added after the packet just sent, in the server's numbering.
     pub fn take_outgoing(&self) -> Vec<Vec<u8>> {
-        std::mem::take(&mut *self.outgoing.lock().unwrap())
+        let made = std::mem::take(&mut *self.outgoing.lock().unwrap());
+        if self.front.is_none() {
+            return made;
+        }
+        // The steps' own bodies are 1.20.2's too: they pass the front like the packet they follow.
+        let mut out = std::mem::take(&mut *self.fronted_after.lock().unwrap());
+        let state = self.writing();
+        for body in made {
+            let mut r = Reader::new(&body);
+            let sent = r.varint().and_then(|id| self.fronted(state, id, r.rest()));
+            match sent {
+                Ok(bodies) => out.extend(bodies),
+                Err(e) => log::warn!(
+                    "Horizon: could not translate a packet for {}: {e}",
+                    self.wire_version().name()
+                ),
+            }
+        }
+        out
     }
 
     /// The handshake states this server's protocol, and its intent moves both directions on.
@@ -264,7 +333,7 @@ impl Session {
         self.set_reading(next);
         let mut w = Writer::new();
         w.varint(ids::handshake::serverbound::INTENTION);
-        w.varint(self.version.protocol());
+        w.varint(self.wire_version().protocol());
         w.string(&host);
         w.u16(port);
         w.varint(intent);
@@ -449,6 +518,133 @@ mod tests {
             assert_eq!(r.string(255).unwrap(), "example.org");
             assert_eq!((s.reading(), s.writing()), (State::Login, State::Login));
         }
+    }
+
+    /// A 1.18.2 server's join, read by Horizon as a 26.3 server's: login, configuration, play.
+    #[test]
+    fn a_1_18_2_join_reaches_horizon_as_its_own_protocol() {
+        use crate::packets::{configuration, login, play};
+        use horizon_world::nbt::{self, NamedTag, Tag};
+        let named = |tag: Tag| {
+            nbt::write_named(
+                &NamedTag {
+                    name: Default::default(),
+                    tag,
+                },
+                nbt::Limits::default(),
+            )
+            .unwrap()
+        };
+        let s = Session::new(ServerVersion::V1_18_2);
+        assert_eq!(s.version, ServerVersion::V1_20_2);
+        let mut hello = Writer::new();
+        hello.varint(crate::PROTOCOL_VERSION);
+        hello.string("example.org");
+        hello.u16(25565);
+        hello.varint(handshake::LOGIN);
+        let sent = s.serverbound(&body(0, &hello.data)).unwrap().unwrap();
+        assert_eq!(Reader::new(&sent[1..]).varint().unwrap(), 758);
+
+        let mut success = Writer::new();
+        success.uuid(5);
+        success.string("Steve");
+        let (id, payload) = s.clientbound(2, success.data).unwrap().unwrap();
+        let login::Clientbound::LoginFinished(finished) =
+            login::Clientbound::decode(id, &payload).unwrap()
+        else {
+            panic!("login finished")
+        };
+        assert_eq!(finished.profile.name, "Steve");
+        // Horizon acknowledges; the old server, in play already, is sent nothing.
+        assert_eq!(
+            s.serverbound(&body(ids::login::serverbound::LOGIN_ACKNOWLEDGED, &[]))
+                .unwrap(),
+            None
+        );
+
+        let dimension = Tag::compound([
+            ("min_y", Tag::Int(0)),
+            ("height", Tag::Int(256)),
+            (
+                "infiniburn",
+                Tag::String("minecraft:infiniburn_overworld".into()),
+            ),
+        ]);
+        let entry = |name: &str, element: Tag| {
+            Tag::compound([
+                ("name", Tag::String(name.into())),
+                ("id", Tag::Int(0)),
+                ("element", element),
+            ])
+        };
+        let codec = Tag::compound([
+            (
+                "minecraft:dimension_type",
+                Tag::compound([(
+                    "value",
+                    Tag::List(vec![entry("minecraft:overworld", dimension.clone())]),
+                )]),
+            ),
+            (
+                "minecraft:worldgen/biome",
+                Tag::compound([(
+                    "value",
+                    Tag::List(vec![entry(
+                        "minecraft:plains",
+                        Tag::compound([("precipitation", Tag::String("rain".into()))]),
+                    )]),
+                )]),
+            ),
+        ]);
+        let mut join = Writer::new();
+        join.i32(42);
+        join.bool(false);
+        join.u8(1);
+        join.i8(-1);
+        join.varint(1);
+        join.string("minecraft:overworld");
+        join.bytes(&named(codec));
+        join.bytes(&named(dimension));
+        join.string("minecraft:overworld");
+        join.i64(0);
+        for n in [20, 10, 8] {
+            join.varint(n);
+        }
+        for flag in [false, true, false, false] {
+            join.bool(flag);
+        }
+        let mut packets = vec![s.clientbound(0x26, join.data).unwrap().unwrap()];
+        packets.extend(std::iter::from_fn(|| s.next_incoming()));
+        let mut registries = Vec::new();
+        let mut finished = false;
+        let mut player = None;
+        for (id, payload) in packets {
+            if !finished {
+                match configuration::Clientbound::decode(id, &payload).unwrap() {
+                    configuration::Clientbound::RegistryData(r) => registries.push(r.registry),
+                    configuration::Clientbound::FinishConfiguration(_) => finished = true,
+                    _ => {}
+                }
+            } else if let play::Clientbound::Login(login) =
+                play::Clientbound::decode(id, &payload).unwrap()
+            {
+                player = Some((login.player_id, login.spawn.dimension, login.chunk_radius));
+            }
+        }
+        for registry in [
+            "minecraft:dimension_type",
+            "minecraft:worldgen/biome",
+            "minecraft:damage_type",
+            "minecraft:chat_type",
+        ] {
+            assert!(registries.iter().any(|r| r == registry), "{registry}");
+        }
+        assert_eq!(
+            player,
+            Some((42, "minecraft:overworld".to_owned(), 10)),
+            "{registries:?}"
+        );
+        assert_eq!(s.reading(), State::Play);
     }
 
     #[test]

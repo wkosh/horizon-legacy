@@ -7,6 +7,7 @@
 //! pinned ones. A Horizon server runs the ids the other way for a client of an older release
 //! ([`ClientSession`], roadmap `older-clients`), when its owner lets such clients join.
 pub mod client_session;
+pub mod front;
 pub mod ids;
 pub mod layout_26_2;
 mod legacy;
@@ -75,11 +76,16 @@ pub enum ServerVersion {
     /// 1.20.3 and 1.20.4: one protocol.
     V1_20_3,
     V1_20_2,
+    /// 1.18.2, through the legacy front ([`front`]): its wire is turned into 1.20.2's, which the
+    /// steps from [`Self::V1_20_2`] up then read.
+    V1_18_2,
+    /// 1.17.1, through the legacy front as well.
+    V1_17_1,
 }
 
 impl ServerVersion {
     /// Newest first.
-    pub const ALL: [Self; 14] = [
+    pub const ALL: [Self; 16] = [
         Self::Current,
         Self::V26_2,
         Self::V26_1,
@@ -94,6 +100,8 @@ impl ServerVersion {
         Self::V1_20_6,
         Self::V1_20_3,
         Self::V1_20_2,
+        Self::V1_18_2,
+        Self::V1_17_1,
     ];
 
     /// Whether this is `other` or an older release: the translation steps from `other` up apply.
@@ -119,6 +127,8 @@ impl ServerVersion {
             Self::V1_20_6 => v1_20_6::PROTOCOL,
             Self::V1_20_3 => v1_20_3::PROTOCOL,
             Self::V1_20_2 => v1_20_2::PROTOCOL,
+            Self::V1_18_2 => front::tables::v758::PROTOCOL,
+            Self::V1_17_1 => front::tables::v756::PROTOCOL,
         }
     }
 
@@ -139,6 +149,17 @@ impl ServerVersion {
             Self::V1_20_6 => v1_20_6::NAME,
             Self::V1_20_3 => v1_20_3::NAME,
             Self::V1_20_2 => v1_20_2::NAME,
+            Self::V1_18_2 => front::tables::v758::NAME,
+            Self::V1_17_1 => front::tables::v756::NAME,
+        }
+    }
+
+    /// The version whose layouts the adapter's steps read for this one: 1.20.2 for the releases the
+    /// legacy front ([`front`]) turns into it, the version itself otherwise.
+    pub fn chain(self) -> Self {
+        match self {
+            Self::V1_18_2 | Self::V1_17_1 => Self::V1_20_2,
+            other => other,
         }
     }
 
@@ -376,7 +397,8 @@ impl ServerVersion {
             Self::V1_21_1 => Some(&V1_21_1),
             Self::V1_20_6 => Some(&V1_20_6),
             Self::V1_20_3 => Some(&V1_20_3),
-            Self::V1_20_2 => Some(&V1_20_2),
+            // The legacy front renumbers to 1.20.2's ids before anything here reads a packet.
+            Self::V1_20_2 | Self::V1_18_2 | Self::V1_17_1 => Some(&V1_20_2),
         }
     }
 
@@ -440,8 +462,12 @@ impl ServerVersion {
             (Self::V1_20_6, Direction::Serverbound) => v1_20_6::serverbound(state),
             (Self::V1_20_3, Direction::Clientbound) => v1_20_3::clientbound(state),
             (Self::V1_20_3, Direction::Serverbound) => v1_20_3::serverbound(state),
-            (Self::V1_20_2, Direction::Clientbound) => v1_20_2::clientbound(state),
-            (Self::V1_20_2, Direction::Serverbound) => v1_20_2::serverbound(state),
+            (Self::V1_20_2 | Self::V1_18_2 | Self::V1_17_1, Direction::Clientbound) => {
+                v1_20_2::clientbound(state)
+            }
+            (Self::V1_20_2 | Self::V1_18_2 | Self::V1_17_1, Direction::Serverbound) => {
+                v1_20_2::serverbound(state)
+            }
         }
     }
 
@@ -531,6 +557,17 @@ mod tests {
             Some(ServerVersion::V1_20_2)
         );
         assert_eq!(ServerVersion::from_protocol(763), None);
+        assert_eq!(
+            ServerVersion::from_protocol(758),
+            Some(ServerVersion::V1_18_2)
+        );
+        assert_eq!(
+            ServerVersion::from_protocol(756),
+            Some(ServerVersion::V1_17_1)
+        );
+        assert_eq!(ServerVersion::from_protocol(757), None);
+        assert_eq!(ServerVersion::V1_17_1.chain(), ServerVersion::V1_20_2);
+        assert!(ServerVersion::V1_17_1.at_most(ServerVersion::V1_18_2));
         assert!(ServerVersion::V26_1.at_most(ServerVersion::V26_2));
         assert!(!ServerVersion::V26_2.at_most(ServerVersion::V26_1));
     }
