@@ -47,3 +47,24 @@ python3 tools/generate_legacy_front.py --data path/to/minecraft-data/data
 - Sounds 1.20.2 removed or renamed are dropped; particles 1.20.2 lacks are not drawn.
 - Game event tags are not passed on (1.19 renamed them; only the server reads them).
 - A recipe type unknown to 1.20.2 drops the whole recipe list, as any packet the front cannot read.
+
+## Releases
+
+Upstream's release workflows run on Horizon's own machines and sign with its keys, so the fork builds its
+releases itself: Linux x86_64 and Windows x64 (cross-compiled with MinGW), each with `horizon-client`,
+`horizon-ctl`, `horizon-prepare` and `horizon-server`, as on the [Releases](https://github.com/wkosh/horizon-legacy/releases)
+page.
+
+```sh
+export HORIZON_VERSION=0.1.0-legacy
+cargo build --release --locked -p horizon-official --bin horizon-official -p horizon-client-lib --bin horizon-ctl \
+  -p horizon-prepare --bin horizon-prepare -p horizon-server --bin horizon-server
+RUSTFLAGS="-C target-feature=+crt-static" cargo build --release --locked --target x86_64-pc-windows-gnu \
+  -p horizon-official --bin horizon-official -p horizon-client-lib --bin horizon-ctl \
+  -p horizon-prepare --bin horizon-prepare -p horizon-server --bin horizon-server
+tools/ci/package-legacy.sh "$HORIZON_VERSION" dist
+```
+
+The archives carry no precompiled exporters (building them takes Mojang's jars): `horizon-prepare` compiles
+them from the Java sources in the archive on the player's first preparation, which needs a Java 25 JDK.
+`packaging/LEGACY.txt` tells players so.
