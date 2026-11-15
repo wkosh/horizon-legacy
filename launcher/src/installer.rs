@@ -27,7 +27,7 @@ const PUBLISHER: &str = "Horizon";
 const ABOUT_URL: &str = "https://playhorizon.dev";
 const UNINSTALL_KEY: &str =
     r"Software\Microsoft\Windows\CurrentVersion\Uninstall\HorizonLegacyLauncher";
-const OWN_KEY: &str = r"Software\Horizon\LegacyLauncher";
+const OWN_KEY: &str = r"Software\HorizonLegacy\Launcher";
 const ASIDE_PREFIX: &str = "horizon-launcher-uninstall-";
 
 pub use crate::setup_args::Mode;
@@ -492,14 +492,14 @@ pub fn uninstall(remove_data: bool, progress: impl Fn(Step, f32)) -> Result<Vec<
             Err(e) => left.push(format!(r"HKCU\{key}: {e}")),
         }
     }
-    // `Software\Horizon` goes only when nothing else (the game) keeps anything in it.
-    if let Ok(parent) = hkcu.open_subkey_with_flags(r"Software\Horizon", KEY_READ) {
+    // `Software\HorizonLegacy` goes only when nothing else (the game) keeps anything in it.
+    if let Ok(parent) = hkcu.open_subkey_with_flags(r"Software\HorizonLegacy", KEY_READ) {
         let empty = parent
             .query_info()
             .is_ok_and(|info| info.sub_keys == 0 && info.values == 0);
         drop(parent);
         if empty {
-            let _ = hkcu.delete_subkey(r"Software\Horizon");
+            let _ = hkcu.delete_subkey(r"Software\HorizonLegacy");
         }
     }
 

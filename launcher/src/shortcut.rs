@@ -1,12 +1,12 @@
 //! A shortcut on the desktop that plays one instance: it runs
 //! `horizon-launcher play --instance <id>`, so the game starts without the launcher's window.
 //!
-//! - Linux: `<name> (Horizon).desktop` on the desktop (executable, and marked trusted with `gio`
+//! - Linux: `<name> (Horizon Legacy).desktop` on the desktop (executable, and marked trusted with `gio`
 //!   where it exists, so GNOME starts it), and the same entry in the applications menu
-//!   (`applications/horizon-instance-<id>.desktop`, `desktop::data_home`).
-//! - macOS: `<name> (Horizon).app`, a small app whose program is a shell script, with Horizon's
+//!   (`applications/horizon-legacy-instance-<id>.desktop`, `desktop::data_home`).
+//! - macOS: `<name> (Horizon Legacy).app`, a small app whose program is a shell script, with Horizon's
 //!   icon. It has no Dock icon of its own (`LSUIElement`): the game's window is the one to see.
-//! - Windows: `<name> (Horizon).lnk`, a Shell Link as Microsoft's published [MS-SHLLINK] format
+//! - Windows: `<name> (Horizon Legacy).lnk`, a Shell Link as Microsoft's published [MS-SHLLINK] format
 //!   lays it out, to the launcher's `.exe` with Horizon's icon.
 //!
 //! Each shortcut names its instance's id inside it, so removing finds it after a rename.
@@ -74,7 +74,7 @@ pub fn file_name(name: &str, system: System) -> String {
         .collect();
     let clean = clean.trim().trim_matches('.');
     let clean = if clean.is_empty() { "Instance" } else { clean };
-    format!("{clean} (Horizon).{}", system.extension())
+    format!("{clean} (Horizon Legacy).{}", system.extension())
 }
 
 /// The id as a file name or bundle id part: letters, digits and `-`.
@@ -341,7 +341,7 @@ pub fn make_in(
     trash: Trash,
 ) -> Result<Vec<PathBuf>, String> {
     let path = desktop.join(file_name(name, system));
-    let item = menu.map(|m| m.join(format!("horizon-instance-{}.desktop", slug(id))));
+    let item = menu.map(|m| m.join(format!("horizon-legacy-instance-{}.desktop", slug(id))));
     for old in find_in(desktop, menu, id) {
         if old != path && Some(&old) != item.as_ref() {
             trash(&old)?;
@@ -392,7 +392,7 @@ pub fn find_in(desktop: &Path, menu: Option<&Path>, id: &str) -> Vec<PathBuf> {
         .filter(|p| plays(p, id))
         .collect();
     if let Some(item) = menu
-        .map(|m| m.join(format!("horizon-instance-{}.desktop", slug(id))))
+        .map(|m| m.join(format!("horizon-legacy-instance-{}.desktop", slug(id))))
         .filter(|p| plays(p, id))
     {
         found.push(item);

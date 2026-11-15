@@ -60,6 +60,19 @@ updates and starts the fork's builds, under its own name (Horizon Legacy) and da
 `launcher@X.Y.Z` release. Its update checks read only this repository (upstream's GitHub mirror is off), and it
 installs only archives signed with the fork's key (`crates/horizon-release-sign/release-keys.txt`).
 
+**Folders.** Nothing is shared with an official Horizon install; both can sit side by side:
+
+| What | Windows | Linux |
+| --- | --- | --- |
+| The launcher (setup's default) | `%LOCALAPPDATA%\Programs\Horizon Legacy` | wherever the archive is unpacked |
+| Versions, prepared resources, Java, the launcher's settings | `%APPDATA%\horizon-legacy-launcher` | `~/.local/share/horizon-legacy-launcher` |
+| The game folder (worlds, options, logs) | `%APPDATA%\horizon-legacy` | `~/.local/share/horizon-legacy` |
+| A moved data location's pointer | `%APPDATA%\horizon-legacy-launcher-location` | `~/.config/horizon-legacy-launcher-location` |
+| Builds, for a user name that isn't ASCII | `C:\ProgramData\horizon-legacy-launcher-<id>` | |
+| Shortcuts and registry | "Horizon Legacy" in the Start menu, `HKCU\Software\HorizonLegacy`, Uninstall `HorizonLegacyLauncher` | `horizon-legacy-launcher.desktop`, `horizon-legacy-instance-<id>.desktop` |
+
+The game started by hand (not by the launcher) uses `horizon-legacy` too; `HORIZON_HOME` still overrides it.
+
 **Versions.** Each update is published twice, `v<N>.0.0-1.18.2` and `v<N>.0.0-1.17.1`, which the launcher lists
 as "Legacy v<N> · 1.18.2" and "Legacy v<N> · 1.17.1"; the next update is v<N+1>. Both carry the same game, which
 joins servers of either release; the launcher passes the line to the game (`HORIZON_LEGACY_TARGET`, the release
