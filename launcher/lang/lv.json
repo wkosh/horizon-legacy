@@ -1022,7 +1022,7 @@
   "Oct {day}": "okt.{day}",
   "Nov {day}": "Nov. {day}",
   "Dec {day}": "{day}. decembris",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizon's Nightly būves, jaunākie vispirms. Jūsu pasaules atrodas spēļu mapē, tāpēc versijas noņemšana tās nekad neskar.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Notiek noņemšana…",
   "Use": "Izmantot",
   "installed": "uzstādīta",

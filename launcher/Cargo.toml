@@ -102,8 +102,8 @@ windows = { version = "0.62", features = ["Win32_Foundation", "Win32_Storage_Fil
 # Per-user setup: the Uninstall entry and the launcher's own key under HKCU (installer.rs).
 winreg = "0.56"
 
-[target.'cfg(windows)'.build-dependencies]
-# The icon resource in the .exe (build.rs).
+[build-dependencies]
+# The icon resource in the .exe (build.rs), also when cross-compiled from Linux (mingw's windres).
 winresource = "0.1"
 
 [dev-dependencies]
@@ -112,3 +112,9 @@ syn = "2"
 
 [profile.release]
 strip = true
+
+# Horizon Legacy: GPUI's Windows renderer compiles its shaders with Windows' own d3dcompiler when it starts
+# instead of with fxc.exe at build time, so the launcher cross-compiles for Windows from Linux
+# (vendor/gpui-fast-windows/HORIZON-LEGACY.md).
+[patch.crates-io]
+gpui-fast-windows = { path = "vendor/gpui-fast-windows" }

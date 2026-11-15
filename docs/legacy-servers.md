@@ -50,21 +50,38 @@ python3 tools/generate_legacy_front.py --data path/to/minecraft-data/data
 
 ## Releases
 
-Upstream's release workflows run on Horizon's own machines and sign with its keys, so the fork builds its
-releases itself: Linux x86_64 and Windows x64 (cross-compiled with MinGW), each with `horizon-client`,
-`horizon-ctl`, `horizon-prepare` and `horizon-server`, as on the [Releases](https://github.com/wkosh/horizon-legacy/releases)
-page.
+Upstream's release workflows run on Horizon's own machines and sign with its keys, so the fork builds and signs
+its releases itself, from Linux: Linux x86_64 and Windows x64 (cross-compiled with MinGW).
+
+**One installer.** The fork's launcher (`launcher/`) is upstream's, pointed at this repository: it installs,
+updates and starts the fork's builds, under its own name (Horizon Legacy) and data folders
+(`horizon-legacy-launcher`, `horizon-legacy`), so it never mixes with an official install. Players download
+`horizon-legacy-setup.exe` (Windows, the per-user installer) or the Linux archive from the newest
+`launcher@X.Y.Z` release. Its update checks read only this repository (upstream's GitHub mirror is off), and it
+installs only archives signed with the fork's key (`crates/horizon-release-sign/release-keys.txt`).
+
+**Versions.** Each update is published twice, `v<N>.0.0-1.18.2` and `v<N>.0.0-1.17.1`, which the launcher lists
+as "Legacy v<N> · 1.18.2" and "Legacy v<N> · 1.17.1"; the next update is v<N+1>. Both carry the same game, which
+joins servers of either release; the launcher passes the line to the game (`HORIZON_LEGACY_TARGET`, the release
+a server whose status ping doesn't answer is joined as) and updates an installed version only to a newer one of
+its own line.
+
+**Windows launcher from Linux.** GPUI's Windows renderer compiles its HLSL with `fxc.exe` at build time, which
+Linux lacks, so the launcher patches `gpui-fast-windows` (`launcher/vendor/gpui-fast-windows`, Apache-2.0) to
+compile the same shaders when it starts, with Windows' own `d3dcompiler_47.dll`.
 
 ```sh
-export HORIZON_VERSION=0.1.0-legacy
+export HORIZON_VERSION=1.0.0 HORIZON_LAUNCHER_VERSION=1.0.0 HORIZON_LAUNCHER_TAG=launcher@1.0.0
 cargo build --release --locked -p horizon-official --bin horizon-official -p horizon-client-lib --bin horizon-ctl \
   -p horizon-prepare --bin horizon-prepare -p horizon-server --bin horizon-server
 RUSTFLAGS="-C target-feature=+crt-static" cargo build --release --locked --target x86_64-pc-windows-gnu \
   -p horizon-official --bin horizon-official -p horizon-client-lib --bin horizon-ctl \
   -p horizon-prepare --bin horizon-prepare -p horizon-server --bin horizon-server
-tools/ci/package-legacy.sh "$HORIZON_VERSION" dist
+(cd launcher && cargo build --release --locked && cargo build --release --locked --target x86_64-pc-windows-gnu)
+RELEASE_SIGNING_KEY=$(cat signing-key.txt) LAUNCHER_VERSION=1.0.0 tools/ci/package-legacy.sh 1 dist
 ```
 
-The archives carry no precompiled exporters (building them takes Mojang's jars): `horizon-prepare` compiles
-them from the Java sources in the archive on the player's first preparation, which needs a Java 25 JDK.
-`packaging/LEGACY.txt` tells players so.
+`dist/<tag>/` then holds each release's files and a `RELEASE.txt` with its title. Publish them as GitHub releases
+(not pre-releases). The archives carry no precompiled exporters (building them takes Mojang's jars):
+`horizon-prepare` compiles them from the Java sources in the archive on the first preparation, with a Java 25 JDK
+the launcher finds or downloads. `packaging/LEGACY.txt` tells players so.

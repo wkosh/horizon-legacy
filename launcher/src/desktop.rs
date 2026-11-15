@@ -1,5 +1,5 @@
 //! Linux: the launcher puts itself in the applications menu. It writes
-//! `applications/horizon-launcher.desktop` (pointing at wherever the binary is now) and Horizon's
+//! `applications/horizon-legacy-launcher.desktop` (pointing at wherever the binary is now) and Horizon's
 //! icon into the `hicolor` theme, under `$XDG_DATA_HOME` (`~/.local/share` by default), so no root
 //! is needed; `horizon.desktop` (hidden from menus) gives the game's window its icon on Wayland.
 //! A release build writes it when it starts only if there is no entry yet or the one there starts
@@ -52,7 +52,7 @@ const ICONS: [(&str, &[u8]); 9] = [
     ),
 ];
 
-const LAUNCHER_ENTRY: &str = "horizon-launcher.desktop";
+const LAUNCHER_ENTRY: &str = "horizon-legacy-launcher.desktop";
 const GAME_ENTRY: &str = "horizon.desktop";
 const GAME_ENTRY_TEXT: &str = include_str!("../../packaging/linux/horizon.desktop");
 
@@ -82,15 +82,15 @@ pub fn launcher_entry(exe: &Path) -> String {
     format!(
         "[Desktop Entry]\n\
          Type=Application\n\
-         Name=Horizon\n\
+         Name=Horizon Legacy\n\
          GenericName=Game launcher\n\
-         Comment=Install, prepare and play Horizon, Minecraft: Java Edition {minecraft} rewritten in Rust\n\
+         Comment=Install, prepare and play Horizon Legacy: Minecraft: Java Edition {minecraft} rewritten in Rust, joining 1.18.2 and 1.17.1 servers\n\
          Exec={}\n\
          TryExec={}\n\
          Icon=horizon\n\
          Terminal=false\n\
          Categories=Game;\n\
-         StartupWMClass=horizon-launcher\n",
+         StartupWMClass=horizon-legacy-launcher\n",
         quote(exe),
         exe.display(),
         minecraft = horizon_platform::version::VANILLA_VERSION,

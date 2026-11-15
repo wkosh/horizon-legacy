@@ -1024,7 +1024,7 @@
   "Oct {day}": "10월 {day}일",
   "Nov {day}": "11월 {day}일",
   "Dec {day}": "12월 {day}일",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizon의 Nightly 빌드, 최신순. 월드는 게임 폴더에 있어서 버전을 지워도 영향을 받지 않습니다.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "제거 중…",
   "Use": "사용",
   "installed": "설치됨",

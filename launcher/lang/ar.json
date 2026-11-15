@@ -1024,7 +1024,7 @@
   "Oct {day}": "{day} أكتوبر",
   "Nov {day}": "{day} نوفمبر",
   "Dec {day}": "{day} ديسمبر",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "إصدارات Horizon الليلية، الأحدث أولًا. عوالمك في مجلد اللعبة، لذا لا تمسّها إزالة إصدار.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "جارٍ الإزالة…",
   "Use": "استخدام",
   "installed": "مثبّت",

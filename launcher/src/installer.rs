@@ -7,7 +7,7 @@
 //! launcher's data folder only when asked, the game's folder never.
 //!
 //! Nothing here deletes a folder it didn't make: the install folder is always called
-//! "Horizon Launcher" ([`folder_for`]) and is removed with `remove_dir`, which only takes an empty one.
+//! "Horizon Legacy" ([`folder_for`]) and is removed with `remove_dir`, which only takes an empty one.
 //!
 //! Command lines (handled in `main` before the CLI parser, so MCP never sees them):
 //! `horizon-launcher-setup.exe` (window), `... setup --quiet [--dir <folder>] [--desktop-shortcut]`,
@@ -21,12 +21,13 @@ use std::path::{Path, PathBuf};
 use winreg::enums::{HKEY_CURRENT_USER, KEY_READ, KEY_WRITE};
 use winreg::RegKey;
 
-pub const APP_NAME: &str = "Horizon Launcher";
+pub const APP_NAME: &str = "Horizon Legacy";
 const BINARY: &str = "horizon-launcher.exe";
 const PUBLISHER: &str = "Horizon";
 const ABOUT_URL: &str = "https://playhorizon.dev";
-const UNINSTALL_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Uninstall\HorizonLauncher";
-const OWN_KEY: &str = r"Software\Horizon\Launcher";
+const UNINSTALL_KEY: &str =
+    r"Software\Microsoft\Windows\CurrentVersion\Uninstall\HorizonLegacyLauncher";
+const OWN_KEY: &str = r"Software\Horizon\LegacyLauncher";
 const ASIDE_PREFIX: &str = "horizon-launcher-uninstall-";
 
 pub use crate::setup_args::Mode;
@@ -46,7 +47,7 @@ pub enum Step {
 
 #[derive(Clone, Debug)]
 pub struct Options {
-    /// Where the launcher goes (always a folder called "Horizon Launcher").
+    /// Where the launcher goes (always a folder called "Horizon Legacy").
     pub dir: PathBuf,
     pub desktop: bool,
     /// Uninstall only: also delete the launcher's data folder.
@@ -79,8 +80,8 @@ fn args() -> Vec<String> {
     std::env::args().skip(1).collect()
 }
 
-/// Whether this binary is the setup: its file name starts with `horizon-launcher-setup` (the
-/// release workflow copies the launcher under that name). `HORIZON_LAUNCHER_SETUP=1` forces it,
+/// Whether this binary is the setup: its file name starts with `horizon-launcher-setup` or
+/// `horizon-legacy-setup` (the release copies the launcher under that name). `HORIZON_LAUNCHER_SETUP=1` forces it,
 /// for screenshots and tests.
 pub fn is_setup_exe() -> bool {
     if std::env::var_os("HORIZON_LAUNCHER_SETUP").is_some_and(|v| v.to_string_lossy() == "1") {
@@ -89,7 +90,11 @@ pub fn is_setup_exe() -> bool {
     backend::exe_path()
         .file_stem()
         .and_then(|s| s.to_str())
-        .is_some_and(|s| s.to_ascii_lowercase().starts_with("horizon-launcher-setup"))
+        .is_some_and(|s| {
+            let s = s.to_ascii_lowercase();
+            // Horizon Legacy's setup is also published as `horizon-legacy-setup.exe`.
+            s.starts_with("horizon-launcher-setup") || s.starts_with("horizon-legacy-setup")
+        })
 }
 
 /// The window to open instead of the launcher: the wizard for the setup exe started without
@@ -116,7 +121,7 @@ pub fn default_dir() -> PathBuf {
         .join(APP_NAME)
 }
 
-/// The install folder for a folder the player picked: always one called "Horizon Launcher", so
+/// The install folder for a folder the player picked: always one called "Horizon Legacy", so
 /// uninstalling never has to guess what is ours.
 pub fn folder_for(chosen: &Path) -> PathBuf {
     if chosen
@@ -440,7 +445,7 @@ fn named(path: &Path, name: &str) -> bool {
 /// of a moved data location, which the move lays out as `<folder>\launcher`, `\game` and `\build`.
 fn made_by_launcher(data: &Path, location: Option<&Roots>) -> bool {
     let laid_out = location.is_some_and(|r| r.launcher == data && named(&r.launcher, "launcher"));
-    named(data, "horizon-launcher") || laid_out
+    named(data, "horizon-legacy-launcher") || laid_out
 }
 
 /// Whether `builds`, [`backend::build_dir`], goes with a data folder the launcher made. In a moved
@@ -716,7 +721,7 @@ mod tests {
             .map_or(temp.clone(), PathBuf::from);
         let dir = temp.join(format!("horizon-link-{}", std::process::id()));
         let _ = fs::remove_dir_all(&dir);
-        let exe = dir.join("Horizon Launcher").join("horizon-launcher.exe");
+        let exe = dir.join("Horizon Legacy").join("horizon-launcher.exe");
         fs::create_dir_all(exe.parent().unwrap()).unwrap();
         fs::write(&exe, b"x").unwrap();
         let link = dir.join("Horizon Launcher.lnk");

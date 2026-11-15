@@ -1022,7 +1022,7 @@
   "Oct {day}": "ಅಕ್ಟೋಬರ್ {day}",
   "Nov {day}": "ನವೆಂಬರ್ {day}",
   "Dec {day}": "ಡಿಸೆಂಬರ್ {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizon ನ ನೈಟ್ಲಿ ಬಿಲ್ಡ್‌ಗಳು, ಹೊಸದು ಮೊದಲು. ನಿಮ್ಮ ಪ್ರಪಂಚಗಳು ಆಟದ ಫೋಲ್ಡರ್‌ನಲ್ಲಿ ವಾಸಿಸುತ್ತವೆ, ಆದ್ದರಿಂದ ಆವೃತ್ತಿಯನ್ನು ತೆಗೆದುಹಾಕುವುದರಿಂದ ಅವುಗಳನ್ನು ಎಂದಿಗೂ ಸ್ಪರ್ಶಿಸುವುದಿಲ್ಲ.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "ತೆಗೆದುಹಾಕಲಾಗುತ್ತಿದೆ...",
   "Use": "ಬಳಸಿ",
   "installed": "ಸ್ಥಾಪಿಸಲಾಗಿದೆ",

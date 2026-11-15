@@ -8,24 +8,26 @@ wkosh/horizon-legacy, que também entra em servidores 1.18.2 e 1.17.1. A
 tradução do protocolo é feita dentro do jogo, em Rust: não precisa de proxy,
 ViaVersion nem Java para jogar. Para desligar: HORIZON_OLDER_SERVERS=0.
 
-Antes de jogar, o Horizon precisa preparar os recursos a partir do SEU
-Minecraft Java Edition 26.3 (veja PLAY.txt). Diferente do release oficial,
-este pacote não traz os exportadores Java pré-compilados: na primeira
-preparação o horizon-prepare compila esses exportadores a partir do código
-que vem nesta pasta. Para isso é preciso um JDK 25 (não basta o runtime),
-por exemplo o Temurin 25. Depois é só seguir o PLAY.txt:
+O jeito mais fácil: baixe o instalador horizon-legacy-setup.exe (Windows) do
+release "launcher@..." mais novo em
+https://github.com/wkosh/horizon-legacy/releases
+O launcher Horizon Legacy instala, prepara e atualiza o jogo sozinho. Na tela
+de versões aparecem "Legacy v1 · 1.18.2" e "Legacy v1 · 1.17.1"; cada
+atualização vira v2, v3... e cada versão só atualiza dentro da sua linha.
+
+Este arquivo é o jogo sem o launcher. Antes de jogar, o Horizon precisa
+preparar os recursos a partir do SEU Minecraft Java Edition 26.3 (veja
+PLAY.txt). Este pacote não traz os exportadores Java pré-compilados: na
+primeira preparação o horizon-prepare compila esses exportadores a partir do
+código que vem nesta pasta, com um JDK 25 (o launcher acha ou baixa um; sem o
+launcher, instale um, por exemplo o Temurin 25). Depois:
     ./horizon-prepare --prepare --server-jar CAMINHO/server.jar
     ./horizon-client --server ip.do.servidor:25565
 
-Se você já tem o Horizon oficial instalado e preparado, pode usar os recursos
-dele: ./horizon-client --resources CAMINHO/.local/horizon-client/26.3
-
 Entrar num servidor 1.18.2 ou 1.17.1: adicione o servidor na lista de
 multiplayer ou use --server. Limites conhecidos: docs/legacy-servers.md no
-repositório. Este pacote não se atualiza sozinho: novas versões em
-https://github.com/wkosh/horizon-legacy/releases
-Atenção: "horizon-server update" instala o build oficial do Horizon, que não
-tem o suporte a 1.18.2/1.17.1.
+repositório. Atenção: "horizon-server update" instala o build oficial do
+Horizon, que não tem o suporte a 1.18.2/1.17.1.
 
 [English]
 
@@ -34,12 +36,15 @@ wkosh/horizon-legacy fork, which also joins 1.18.2 and 1.17.1 servers. The
 protocol is translated inside the game, in Rust. HORIZON_OLDER_SERVERS=0
 turns it off.
 
-Unlike the official release, this archive has no precompiled Java exporters:
-the first preparation compiles them from the sources in this folder, so it
-needs a Java 25 JDK (not only a runtime). Then follow PLAY.txt. Resources an
-official Horizon install already prepared work too (--resources). This build
-does not update itself: https://github.com/wkosh/horizon-legacy/releases
-("horizon-server update" installs upstream's build, without 1.18.2/1.17.1).
+Easiest: install horizon-legacy-setup.exe (Windows) from the newest
+"launcher@..." release at https://github.com/wkosh/horizon-legacy/releases;
+the Horizon Legacy launcher installs, prepares and updates the game, listing
+"Legacy v1 · 1.18.2" and "Legacy v1 · 1.17.1" (then v2, v3...).
+
+This archive is the game alone. It has no precompiled Java exporters: the
+first preparation compiles them from the sources in this folder with a Java 25
+JDK (the launcher finds or downloads one). Then follow PLAY.txt.
+("horizon-server update" installs upstream's build, without 1.18.2/1.17.1.)
 
 Horizon is an unofficial fan project, not affiliated with Mojang Studios or
 Microsoft. This folder contains none of Minecraft's code, textures or sounds.

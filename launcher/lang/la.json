@@ -1022,7 +1022,7 @@
   "Oct {day}": "Oct{day}",
   "Nov {day}": "Nov{day}",
   "Dec {day}": "Dec{day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizon nocturnum aedificat, novissimum primum. Mundi tui in ludo folder vivunt, sic versionem removens eos numquam tangit.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Removere…",
   "Use": "Usus",
   "installed": "institutum",

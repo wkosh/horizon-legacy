@@ -1022,7 +1022,7 @@
   "Oct {day}": "அக்டோபர் {day}",
   "Nov {day}": "நவம்பர் {day}",
   "Dec {day}": "டிசம்பர் {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Horizon இன் நைட்லி பில்ட்ஸ், புதியது முதலில். உங்கள் உலகங்கள் கேம் கோப்புறையில் உள்ளன, எனவே பதிப்பை அகற்றுவது அவற்றைத் தொடாது.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "நீக்குகிறது…",
   "Use": "பயன்படுத்தவும்",
   "installed": "நிறுவப்பட்டது",

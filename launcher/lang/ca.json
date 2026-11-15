@@ -1022,7 +1022,7 @@
   "Oct {day}": "{day} oct.",
   "Nov {day}": "novembre {day}",
   "Dec {day}": "desembre {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Les versions nocturnes d'Horizon, primer les més noves. Els vostres mons viuen a la carpeta del joc, de manera que eliminar una versió no els toca mai.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "S'està eliminant…",
   "Use": "Ús",
   "installed": "instal·lat",

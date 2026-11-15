@@ -1024,7 +1024,7 @@
   "Oct {day}": "oct. {day}",
   "Nov {day}": "noiembrie {day}",
   "Dec {day}": "dec. {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Versiunile nocturne ale lui Horizon, cele mai noi primele. Lumile tale trăiesc în folderul jocului, așa că eliminarea unei versiuni nu le atinge niciodată.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Se elimină…",
   "Use": "Utilizați",
   "installed": "instalat",

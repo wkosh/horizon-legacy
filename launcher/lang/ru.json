@@ -1024,7 +1024,7 @@
   "Oct {day}": "{day} окт.",
   "Nov {day}": "{day} нояб.",
   "Dec {day}": "{day} дек.",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Ночные сборки Horizon, сначала новые. Ваши миры лежат в папке игры, поэтому удаление версии их не затрагивает.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Удаление…",
   "Use": "Использовать",
   "installed": "установлена",

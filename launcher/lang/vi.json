@@ -1024,7 +1024,7 @@
   "Oct {day}": "Tháng 10 {day}",
   "Nov {day}": "Tháng 11 {day}",
   "Dec {day}": "Tháng mười hai {day}",
-  "Horizon's Nightly builds, newest first. Your worlds live in the game folder, so removing a version never touches them.": "Các bản dựng hàng đêm của Horizon, mới nhất đầu tiên. Thế giới của bạn nằm trong thư mục trò chơi nên việc xóa một phiên bản sẽ không bao giờ chạm đến chúng.",
+  "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.": "Horizon Legacy's builds for 1.18.2 and 1.17.1, newest first. Each one updates only within its own release. Your worlds live in the game folder, so removing a version never touches them.",
   "Removing…": "Đang xóa…",
   "Use": "sử dụng",
   "installed": "đã cài đặt",

@@ -729,9 +729,22 @@ fn older_server(address: &str) -> Option<horizon_protocol::adapter::ServerVersio
     if !older_servers_enabled() {
         return None;
     }
-    let (json, _) = ping(address, Duration::from_secs(5)).ok()?;
+    let Ok((json, _)) = ping(address, Duration::from_secs(5)) else {
+        return legacy_line();
+    };
     let protocol = i32::try_from(json["version"]["protocol"].as_i64()?).ok()?;
     ServerVersion::from_protocol(protocol).filter(|v| *v != ServerVersion::Current)
+}
+
+/// The release this copy of Horizon Legacy is installed as (`HORIZON_LEGACY_TARGET`, `1.18.2` or `1.17.1`,
+/// which the launcher sets from the version's line): a server whose status ping doesn't answer is joined
+/// as one of that release.
+fn legacy_line() -> Option<horizon_protocol::adapter::ServerVersion> {
+    use horizon_protocol::adapter::ServerVersion;
+    let name = std::env::var("HORIZON_LEGACY_TARGET").ok()?;
+    ServerVersion::ALL
+        .into_iter()
+        .find(|v| v.chain() != *v && v.name() == name.trim())
 }
 
 /// `Connection.exceptionCaught`: a read that timed out ends with
