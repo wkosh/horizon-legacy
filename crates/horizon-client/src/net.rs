@@ -715,10 +715,11 @@ fn connect_tcp(
     Ok((c, host, port))
 }
 
-/// Whether joining servers of older releases is on (roadmap `older-servers`): off by default while the
-/// adapter is incomplete; `HORIZON_OLDER_SERVERS=1` turns it on.
+/// Whether joining servers of older releases is on (roadmap `older-servers`). Upstream keeps it off
+/// while the adapter is incomplete; this fork exists to join 1.18.2 and 1.17.1 servers, so it is on
+/// unless `HORIZON_OLDER_SERVERS=0` turns it off.
 pub fn older_servers_enabled() -> bool {
-    std::env::var_os("HORIZON_OLDER_SERVERS").is_some_and(|v| v == "1")
+    std::env::var_os("HORIZON_OLDER_SERVERS").is_none_or(|v| v != "0")
 }
 
 /// The older release a server speaks, by its status ping, when Horizon can translate it; `None` for the
